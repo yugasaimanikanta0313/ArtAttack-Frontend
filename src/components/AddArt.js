@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addArt } from '../services/api'; // Import the function from api.js
+import { addArt } from '../services/api'; 
 import AdminNavbar from './AdminNavbar';
 
 const AddArt = () => {
@@ -13,16 +13,42 @@ const AddArt = () => {
         file3: null,
         file4: null,
     });
+    const [fileNames, setFileNames] = useState({
+        file1: '',
+        file2: '',
+        file3: '',
+        file4: '',
+    });
 
     const [message, setMessage] = useState('');
 
+    // const handleChange = (e) => {
+    //     const { name, files } = e.target;
+    //     setFormData((prevData) => ({
+    //         ...prevData,
+    //         [name]: files[0],
+    //     }));
+    // };
     const handleChange = (e) => {
-        const { name, files } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: files[0],
-        }));
+        const { name, type, value, files } = e.target;
+    
+        if (type === "file") {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: files[0],
+            }));
+            setFileNames((prevNames) => ({
+                ...prevNames,
+                [name]: files[0]?.name || '', 
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -182,7 +208,7 @@ const AddArt = () => {
                     <input
                         type="text"
                         name="description"
-                        placeholder="Description"
+                        placeholder="ArtistName"
                         value={formData.description}
                         onChange={handleChange}
                         required
@@ -213,6 +239,8 @@ const AddArt = () => {
                             onChange={handleChange}
                             required
                         />
+                        
+                        <div className="file-name">{fileNames.file1 || "  No file chosen"}</div>
                     </label>
 
                     <label className="file-upload">
@@ -223,7 +251,9 @@ const AddArt = () => {
                             name="file2"
                             onChange={handleChange}
                             required
-                        />
+                        />                  
+                         <div className="file-name">{fileNames.file2 || "No file chosen"}</div>
+
                     </label>
 
                     <label className="file-upload">
@@ -235,6 +265,8 @@ const AddArt = () => {
                             onChange={handleChange}
                             required
                         />
+                    <div className="file-name">{fileNames.file3 || "No file chosen"}</div>
+
                     </label>
 
                     <label className="file-upload">
@@ -246,6 +278,8 @@ const AddArt = () => {
                             onChange={handleChange}
                             required
                         />
+                    <div className="file-name">{fileNames.file4 || "No file chosen"}</div>
+
                     </label>
 
                     <button type="submit">Add Art</button>

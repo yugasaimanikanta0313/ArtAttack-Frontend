@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
-import { getArtById, addToWishlist } from '../services/api'; 
+import { getArtById, addToWishlist,addToCart } from '../services/api'; 
+import { getSession } from '../utils/cookieUtils'; // Import getSession utility
+import IconButton from '@mui/material/IconButton';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Import ShoppingCartIcon
 
 const UserViewArt = () => {
     const { artId } = useParams(); 
     const [art, setArt] = useState(null);
     const [currentImage, setCurrentImage] = useState('');
-    const navigate = useNavigate(); // Hook for navigation
+    const navigate = useNavigate(); 
+    const userId = getSession('userId'); // Retrieve userId from cookies
 
     useEffect(() => {
         const fetchArt = async () => {
@@ -22,17 +27,34 @@ const UserViewArt = () => {
         fetchArt();
     }, [artId]);
 
-    // Function to handle adding to cart
-    const handleAddToCart = () => {
-        alert(`${art.artTitle} has been added to your cart.`); 
-        navigate('/cart'); // Navigate to the Cart page
+    const handleAddToCart = async () => {
+        try {
+            if (!userId) {
+                alert("User not logged in. Please log in to add items to your cart.");
+                navigate('/login'); // Redirect to login if userId is missing
+                return;
+            }
+    
+            const quantity = 1; // or get this from a state or input
+            await addToCart(userId, art.id, quantity); // Include quantity
+            alert(`${art.artTitle} has been added to your cart.`);
+            navigate('/cart'); // Navigate to the cart after adding
+        } catch (error) {
+            console.error("Error adding to cart", error);
+            alert("Failed to add to cart. Please try again.");
+        }
     };
+    
 
-    // Function to handle adding to wishlist
     const handleAddToWishlist = async () => {
         try {
-            const userId = 1; // Example userId, replace with actual user data if needed
-            await addToWishlist(userId, art.id);
+            if (!userId) {
+                alert("User not logged in. Please log in to add items to your wishlist.");
+                navigate('/login'); // Redirect to login if userId is missing
+                return;
+            }
+
+            await addToWishlist(userId, art.id); // Pass userId and artId to addToWishlist
             alert(`${art.artTitle} has been added to your wishlist.`);
             navigate('/wishlist');
         } catch (error) {
@@ -45,6 +67,7 @@ const UserViewArt = () => {
 
     return (
         <div className="view-art-container">
+            {/* Your existing styles and layout */}
             <style>{`
                 body {
                     background-color: #1e1e1e;
@@ -134,36 +157,10 @@ const UserViewArt = () => {
                     gap: 15px;
                     margin-top: 20px;
                 }
-
-                .buttons button {
-                    padding: 10px 20px;
-                    font-size: 16px;
-                    border-radius: 25px;
-                    border: none;
-                    cursor: pointer;
-                    transition: background-color 0.3s ease;
-                    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
-                }
-
-                .buttons button:first-child {
-                    background-color: #ff6f61;
-                    color: white;
-                }
-
-                .buttons button:first-child:hover {
-                    background-color: #ff4a3b;
-                }
-
-                .buttons button:last-child {
-                    background-color: #007bff;
-                    color: white;
-                }
-
-                .buttons button:last-child:hover {
-                    background-color: #0056b3;
-                }
+                    .wishlist-icon:hover {
+    background-color: #F95454; /* Lighter red for hover */
+}
             `}</style>
-
             <div className="image-section">
                 <img src={currentImage} alt={art.artTitle} />
                 <div className="image-icons">
@@ -188,8 +185,12 @@ const UserViewArt = () => {
                 <p>Category: {art.category}</p>
                 <p>Price: ${art.price ? art.price.toFixed(2) : 'N/A'}</p>
                 <div className="buttons">
-                    <button onClick={handleAddToCart}>Add to Cart</button>
-                    <button onClick={handleAddToWishlist}>Wishlist</button>
+                    <IconButton onClick={handleAddToCart} color="primary">
+                        <ShoppingCartIcon />
+                    </IconButton>
+                    <IconButton className="wishlist-icon"  onClick={handleAddToWishlist} color="secondary">
+                        <FavoriteIcon />
+                    </IconButton>
                 </div>
             </div>
         </div>

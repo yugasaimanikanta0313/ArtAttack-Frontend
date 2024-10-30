@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from './AdminNavbar';
+import { clearSession, getSession } from '../utils/cookieUtils'; // Import cookie utilities
 
 function AdminHome() {
     const navigate = useNavigate();
 
+    useEffect(() => {
+        // Check if the userId cookie exists on load
+        if (!getSession('userId')) {
+            navigate('/login'); // Redirect if the cookie is missing
+        }
+    }, [navigate]);
+
     const handleLogout = () => {
-        // Logic for logging out (e.g., clearing tokens)
+        sessionStorage.clear(); // Clear session storage if needed
+        clearSession('userId'); // Clear userId cookie
+
         navigate('/login');
     };
 
     return (
         <div style={styles.page}>
-            <AdminNavbar/>
+            <AdminNavbar />
             <h1 style={styles.title}>Admin Dashboard</h1>
             <p style={styles.text}>Welcome, Admin! Here you can manage the website's settings, users, and more.</p>
             <button style={styles.button} onClick={handleLogout}>Logout</button>

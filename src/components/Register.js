@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock, FaArrowRight } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -27,13 +27,13 @@ const Register = () => {
     <div className="container">
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+          @import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
 
           * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Raleway, sans-serif;
+            font-family: 'Roboto', sans-serif;
           }
 
           body {
@@ -116,26 +116,22 @@ const Register = () => {
 
           .login__submit {
             width: 100%;
-            padding: 15px;
-            background: #00f5ff;
-            color: #000;
+            padding: 10px;
+            background: linear-gradient(90deg, #00f5ff, #00c3ff);
+            color: #fff;
             font-weight: bold;
             text-transform: uppercase;
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 50px rgba(0, 255, 255, 0.3);
-            transition: background 0.3s, transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.6);
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
           }
 
           .login__submit:hover {
-            background: #00c3ff;
+            background: linear-gradient(90deg, #00c3ff, #00f5ff);
             transform: scale(1.05);
-          }
-
-          .button__icon {
-            font-size: 20px;
-            margin-left: auto;
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.8);
           }
 
           .screen__background {
@@ -229,7 +225,7 @@ const Register = () => {
               />
             </div>
             <button className="login__submit" type="submit">
-              Register <FaArrowRight className="button__icon" />
+              Register
             </button>
           </form>
         </div>
