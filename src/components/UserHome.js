@@ -1,21 +1,62 @@
 import React from 'react';
 import UserNavbar from './UserNavbar';
-// import { useNavigate } from 'react-router-dom';
+import 'css-doodle';
 
 function UserHome() {
-    // const navigate = useNavigate();
-
-    // const handleLogout = () => {
-    //     // Logic for logging out (e.g., clearing tokens)
-    //     navigate('/login');
-    // };
-
     return (
         <div style={styles.page}>
-            {/* <h1 style={styles.title}>User Dashboard</h1>
-            <p style={styles.text}>Welcome, User! Explore your dashboard and manage your profile here.</p>
-            <button style={styles.button} onClick={handleLogout}>Logout</button> */}
-            <UserNavbar/>
+            {/* Add css-doodle as a background effect */}
+            <css-doodle>
+                <style>
+                    {`
+                    --color: #51eaea, #fffde1, #ff9d76, #FB3569;
+
+                    @grid: 30x1 / 100vw 100vh / #270f34; 
+
+                    :container {
+                        perspective: 30vmin;
+                        --deg: @p(-180deg, 180deg);
+                    }
+
+                    :after, :before {
+                        content: '';
+                        background: @p(--color); 
+                        @place: @r(100%) @r(100%);
+                        @size: @r(6px);
+                        @shape: heart;
+                    }
+
+                    @place: center;
+                    @size: 18vmin; 
+
+                    box-shadow: @m2(0 0 50px @p(--color));
+                    background: @m100(
+                        radial-gradient(@p(--color) 50%, transparent 0) 
+                        @r(-20%, 120%) @r(-20%, 100%) / 1px 1px
+                        no-repeat
+                    );
+
+                    will-change: transform, opacity;
+                    animation: scale-up 12s linear infinite;
+                    animation-delay: calc(-12s / @I * @i);
+
+                    @keyframes scale-up {
+                        0%, 95.01%, 100% {
+                            transform: translateZ(0) rotate(0);
+                            opacity: 0;
+                        }
+                        10% { 
+                            opacity: 1; 
+                        }
+                        95% {
+                            transform: 
+                            translateZ(35vmin) rotateZ(var(--deg));
+                        }
+                    }
+                    `}
+                </style>
+            </css-doodle>
+            <UserNavbar />
         </div>
     );
 }
@@ -29,25 +70,8 @@ const styles = {
         alignItems: 'center',
         backgroundColor: '#1a1a1a',
         color: '#fff',
-    },
-    title: {
-        fontSize: '3rem',
-        color: '#00f5ff',
-        textShadow: '0 0 10px rgba(0, 255, 255, 0.7)',
-    },
-    text: {
-        fontSize: '1.2rem',
-        marginBottom: '20px',
-    },
-    button: {
-        backgroundColor: '#00f5ff',
-        color: '#000',
-        fontSize: '1.2rem',
-        padding: '10px 20px',
-        border: 'none',
-        borderRadius: '25px',
-        cursor: 'pointer',
-        boxShadow: '0 0 20px rgba(0, 255, 255, 0.6)',
+        overflow: 'hidden',
+        position: 'relative',
     },
 };
 

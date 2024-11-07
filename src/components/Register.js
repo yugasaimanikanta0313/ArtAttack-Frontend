@@ -5,21 +5,36 @@ import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMessage(''); // Clear error message on input change
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
     axios.post('/register', formData)
       .then(response => {
         console.log(response.data);
-        navigate('/verify');
+        setSuccessMessage('Registration successful! Redirecting...');
+        setTimeout(() => {
+          navigate('/verify');
+        }, 2000);
       })
       .catch(error => {
         console.error('There was an error!', error);
+        setErrorMessage('Registration failed. Please check your details or try again.');
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -134,6 +149,16 @@ const Register = () => {
             box-shadow: 0 8px 25px rgba(0, 255, 255, 0.8);
           }
 
+          .error-message {
+            color: red;
+            margin: 10px 0;
+          }
+
+          .success-message {
+            color: green;
+            margin: 10px 0;
+          }
+
           .screen__background {
             position: absolute;
             top: 0;
@@ -188,6 +213,8 @@ const Register = () => {
       <div className="screen">
         <div className="screen__content">
           <form className="login" onSubmit={handleSubmit}>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            {successMessage && <div className="success-message">{successMessage}</div>}
             <div className="login__field">
               <FaUser className="login__icon" />
               <input
@@ -224,8 +251,8 @@ const Register = () => {
                 required
               />
             </div>
-            <button className="login__submit" type="submit">
-              Register
+            <button className="login__submit" type="submit" disabled={loading}>
+              {loading ? 'Registering...' : 'Register'}
             </button>
           </form>
         </div>

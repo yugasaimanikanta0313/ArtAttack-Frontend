@@ -26,6 +26,37 @@ const CART_URL = '/cart';
 const USER_URL = '/users';
 
 // API functions
+export const resetPassword = async (data) => {
+    const response = await fetch('/reset-password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        try {
+            const errorData = await response.json(); // Attempt to parse error details from JSON
+            throw new Error(errorData.message || 'Failed to reset password');
+        } catch (error) {
+            throw new Error('Failed to reset password: ' + response.statusText); // Fallback for non-JSON response
+        }
+    }
+
+    const responseData = await response.json(); // Always expect valid JSON response here
+    return { success: responseData.success, message: responseData.message };
+};
+
+
+export const forgotPassword = async (data) => {
+    try {
+        const response = await api.post('/forgot-password', data);
+        return response.data; // Assuming the response contains a message
+    } catch (error) {
+        handleApiError(error);
+    }
+};
 
 export const userProfileUpdate = async (userId, formData) => {
     try {
@@ -139,7 +170,16 @@ export const deleteArtById = async (id) => {
         handleApiError(error);
     }
 };
-
+export const searchArts = async (query) => {
+    try {
+        const response = await api.get(`${ARTS_URL}/search`, {
+            params: { q: query } // Pass the search term as a query parameter
+        });
+        return response.data; // Return the search results
+    } catch (error) {
+        handleApiError(error);
+    }
+};
 // Update art by ID
 // export const updateArtById = async (id, updatedData) => {
 //     try {

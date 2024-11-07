@@ -75,3 +75,29 @@ nav img {
 .nav-links .login-link {
     margin-left: auto; /* Push the Login link to the left */
 }
+
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+    .homepage-container {
+        background-size: contain; /* Change to contain on smaller screens */
+    }
+
+    .nav-link {
+        font-size: 14px; /* Smaller font size for mobile */
+    }
+
+    nav {
+        flex-direction: column; /* Stack navigation links on smaller screens */
+        align-items: flex-start; /* Align to the left */
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-link {
+        font-size: 12px; /* Further reduce font size for very small screens */
+    }
+
+    .homepage-container {
+        padding: 10px; /* Adjust padding for smaller screens */
+    }
+}

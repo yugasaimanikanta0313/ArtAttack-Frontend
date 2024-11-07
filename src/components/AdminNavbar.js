@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu'; 
 import { Menu, MenuItem, IconButton } from '@mui/material'; 
 import '../styles/AdminNavbar.css';
+import { clearSession, getSession } from '../utils/cookieUtils'; // Import cookie utilities
 
 const AdminNavbar = () => {
   const [anchorEl, setAnchorEl] = useState(null); // State to manage the dropdown
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    // Check if the userId cookie exists on load
+    if (!getSession('userId')) {
+        navigate('/login'); // Redirect if the cookie is missing
+    }
+}, [navigate]);
+
+const handleLogout = () => {
+    sessionStorage.clear(); // Clear session storage if needed
+    clearSession('userId'); // Clear userId cookie
+
+    navigate('/');
+};
   // Function to open the dropdown menu
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -45,6 +60,9 @@ const AdminNavbar = () => {
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
           <Link to="/view-all-users" className="menu-link">View All Users</Link>
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <Link className="menu-link">Logout</Link>
         </MenuItem>
       </Menu>
     </nav>

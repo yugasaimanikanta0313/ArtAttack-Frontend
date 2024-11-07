@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const userId = getSession('userId');
-    const [quantities, setQuantities] = useState({}); // State to store quantities
+    const [quantities, setQuantities] = useState({});
 
     useEffect(() => {
         const fetchCartItems = async () => {
@@ -17,20 +17,19 @@ const Cart = () => {
                 setCartItems(items);
                 const initialQuantities = {};
                 items.forEach(item => {
-                    initialQuantities[item.id] = item.quantity; // Initialize quantities state
+                    initialQuantities[item.id] = item.quantity;
                 });
                 setQuantities(initialQuantities);
             } catch (error) {
                 console.error("Error fetching cart items:", error);
             }
         };
-
         fetchCartItems();
     }, [userId]);
 
     const handleUpdateQuantity = async (itemId) => {
         const quantity = quantities[itemId];
-        if (quantity < 1) return; // Prevent updating to less than 1
+        if (quantity < 1) return;
         try {
             const updatedItem = await updateCartItem(userId, itemId, quantity);
             setCartItems(prevItems => 
@@ -43,7 +42,7 @@ const Cart = () => {
 
     const handleRemoveItem = async (itemId) => {
         try {
-            await removeFromCart(itemId); // Remove item directly by its ID
+            await removeFromCart(itemId);
             setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
         } catch (error) {
             console.error("Error removing cart item:", error);
@@ -54,7 +53,7 @@ const Cart = () => {
         try {
             await clearUserCart(userId);
             setCartItems([]);
-            setQuantities({}); // Clear quantities
+            setQuantities({});
         } catch (error) {
             console.error("Error clearing cart:", error);
         }
@@ -62,7 +61,7 @@ const Cart = () => {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            return total + item.price * (quantities[item.id] || 0); // Calculate total based on quantities
+            return total + item.price * (quantities[item.id] || 0);
         }, 0);
     };
 
@@ -76,7 +75,7 @@ const Cart = () => {
             color: '#FFF', 
             padding: '20px', 
             borderRadius: '8px',
-            minHeight: '100vh', // Ensures the cart occupies full viewport height
+            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'
@@ -85,15 +84,15 @@ const Cart = () => {
             {cartItems.length === 0 ? (
                 <Typography>No items in your cart.</Typography>
             ) : (
-                <TableContainer component={Paper} style={{ backgroundColor: '#3A3A3A' }}>
+                <TableContainer component={Paper} sx={{ backgroundColor: '#3A3A3A' }}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell style={{ color: '#FFF' }}>Image</TableCell> {/* New Image Column */}
-                                <TableCell style={{ color: '#FFF' }}>Art Title</TableCell>
-                                <TableCell style={{ color: '#FFF' }}>Price</TableCell>
-                                <TableCell style={{ color: '#FFF' }}>Quantity</TableCell>
-                                <TableCell style={{ color: '#FFF' }}>Actions</TableCell>
+                                <TableCell sx={{ color: '#FFF' }}>Image</TableCell>
+                                <TableCell sx={{ color: '#FFF' }}>Art Title</TableCell>
+                                <TableCell sx={{ color: '#FFF' }}>Price</TableCell>
+                                <TableCell sx={{ color: '#FFF' }}>Quantity</TableCell>
+                                <TableCell sx={{ color: '#FFF' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -101,27 +100,41 @@ const Cart = () => {
                                 <TableRow key={item.id}>
                                     <TableCell>
                                         <img 
-                                           src={item.art?.pictureUrl1 || 'default.jpg'} // Access the picture URL correctly
-                                           alt={item.art?.artTitle || 'Artwork'}
-                                            style={{ width: '60px', height: '60px', borderRadius: '4px' }} // Adjust image size and shape
+                                            src={item.art?.pictureUrl1 || 'default.jpg'}
+                                            alt={item.art?.artTitle || 'Artwork'}
+                                            style={{ width: '60px', height: '60px', borderRadius: '4px' }}
                                         />
                                     </TableCell>
-                                    <TableCell style={{ color: '#FFF' }}>{item.artTitle}</TableCell>
-                                    <TableCell style={{ color: '#FFF' }}>${item.price.toFixed(2)}</TableCell>
-                                    <TableCell style={{ color: '#FFF' }}>
+                                    <TableCell sx={{ color: '#FFF' }}>{item.artTitle}</TableCell>
+                                    <TableCell sx={{ color: '#FFF' }}>${item.price.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ color: '#FFF' }}>
                                         <input
                                             type="number"
-                                            min="0" // Prevents negative values in the input field
+                                            min="0"
                                             value={quantities[item.id]}
                                             onChange={(e) => {
                                                 const newQuantity = parseInt(e.target.value);
-                                                if (newQuantity >= 0) { // Ensure quantity is not negative
+                                                if (newQuantity >= 0) {
                                                     setQuantities(prev => ({ ...prev, [item.id]: newQuantity }));
                                                 }
                                             }}
-                                            style={{ width: '60px', marginRight: '5px', backgroundColor: '#444', color: '#FFF', border: 'none', borderRadius: '4px', padding: '5px' }}
+                                            style={{ 
+                                                width: '60px', 
+                                                marginRight: '5px', 
+                                                backgroundColor: '#444', 
+                                                color: '#FFF', 
+                                                border: 'none', 
+                                                borderRadius: '4px', 
+                                                padding: '5px' 
+                                            }}
                                         />
-                                        <Button variant="contained" color="primary" onClick={() => handleUpdateQuantity(item.id)}>Save</Button>
+                                        <Button 
+                                            variant="contained" 
+                                            color="primary" 
+                                            onClick={() => handleUpdateQuantity(item.id)}
+                                        >
+                                            Save
+                                        </Button>
                                     </TableCell>
                                     <TableCell>
                                         <IconButton onClick={() => handleRemoveItem(item.id)} color="secondary">
@@ -137,7 +150,7 @@ const Cart = () => {
             {cartItems.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                     <Typography variant="h5">Total: ${calculateTotal().toFixed(2)}</Typography>
-                    <Button variant="contained" color="secondary" onClick={handleClearCart} style={{ marginRight: '10px' }}>Clear Cart</Button>
+                    <Button variant="contained" color="secondary" onClick={handleClearCart} sx={{ marginRight: '10px' }}>Clear Cart</Button>
                     <Button variant="contained" color="success" onClick={handleCheckout}>Checkout</Button>
                 </div>
             )}

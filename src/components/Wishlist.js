@@ -6,20 +6,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { getSession } from '../utils/cookieUtils';
 
-const Wishlist = ({ userId }) => {
+const Wishlist = () => {
     const [wishlist, setWishlist] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const scrollRefs = useRef({});
-    const [scrollLeftVisible, setScrollLeftVisible] = useState({});
-    const navigate = useNavigate(); // Initialize navigate function
+    const [scrollVisibility, setScrollVisibility] = useState({});
+    const navigate = useNavigate();
+    const userId = getSession('userId'); // Retrieve userId from cookies
 
     useEffect(() => {
         const fetchWishlist = async () => {
             try {
                 const data = await getUserWishlist(userId);
-                console.log("Fetched wishlist data:", data);
                 setWishlist(data);
             } catch (err) {
                 setError(err.message);
@@ -51,9 +52,15 @@ const Wishlist = ({ userId }) => {
     const onScroll = (category) => {
         const scrollContainer = scrollRefs.current[category];
         if (scrollContainer) {
-            setScrollLeftVisible((prev) => ({
+            const isAtStart = scrollContainer.scrollLeft === 0;
+            const isAtEnd = scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth;
+
+            setScrollVisibility((prev) => ({
                 ...prev,
-                [category]: scrollContainer.scrollLeft > 0,
+                [category]: {
+                    showLeft: !isAtStart,
+                    showRight: !isAtEnd,
+                },
             }));
         }
     };
@@ -89,20 +96,24 @@ const Wishlist = ({ userId }) => {
     }, {});
 
     return (
-        <div style={{ maxWidth: '1200px', margin: 'auto', padding: '20px', backgroundColor: '#1b1b2f', color: '#fff', borderRadius: '15px' }}>
-            <Typography variant="h4" gutterBottom style={{ color: '#FFD700' }}>
+        <div style={styles.container}>
+            <Typography variant="h4" gutterBottom style={styles.title}>
                 Your Wishlist
             </Typography>
             {wishlist.length === 0 ? (
-                <Typography variant="body1" style={{ color: '#b3b3b3' }}>No items in your wishlist.</Typography>
+                <Typography variant="body1" style={styles.noItemsText}>
+                    No items in your wishlist.
+                </Typography>
             ) : (
                 Object.entries(groupedWishlist).map(([category, items]) => (
                     <div key={category} style={{ marginBottom: '30px' }}>
-                        <Typography variant="h5" style={{ color: '#FFD700', marginBottom: '10px' }}>{category}</Typography>
-                        <div style={{ position: 'relative', overflow: 'hidden' }}>
-                            {scrollLeftVisible[category] && (
-                                <IconButton onClick={() => scrollLeft(category)} style={{ position: 'absolute', left: '10px', zIndex: 1 }}>
-                                    <ArrowBackIcon style={{ color: '#FFD700' }} />
+                        <Typography variant="h5" style={styles.categoryTitle}>
+                            {category}
+                        </Typography>
+                        <div style={styles.sliderWrapper}>
+                            {scrollVisibility[category]?.showLeft && (
+                                <IconButton onClick={() => scrollLeft(category)} style={{ ...styles.scrollButton, left: 0 }}>
+                                    <ArrowBackIcon style={styles.icon} />
                                 </IconButton>
                             )}
                             <div
@@ -113,34 +124,36 @@ const Wishlist = ({ userId }) => {
                                 {items.map((item) => (
                                     <div 
                                         key={item.id} 
-                                        style={{ display: 'inline-block', minWidth: '300px', marginRight: '10px', cursor: 'pointer' }}
-                                        onClick={() => goToArtDetail(item.art.id)} // Navigate on card click
+                                        style={styles.cardWrapper}
+                                        onClick={() => goToArtDetail(item.art.id)}
                                     >
-                                        <Card style={{ backgroundColor: '#2e2e3d', borderRadius: '15px', boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)', width: '300px' }}>
+                                        <Card style={styles.card}>
                                             <CardMedia
                                                 component="img"
                                                 height="250"
                                                 image={item.art?.pictureUrl1 || 'default.jpg'}
                                                 alt={item.art?.artTitle || 'Artwork'}
-                                                style={{ borderRadius: '15px 15px 0 0', objectFit: 'cover' }}
+                                                style={styles.cardImage}
                                             />
-                                            <CardContent style={{ color: '#d1d1e9' }}>
-                                                <Typography variant="h6" style={{ color: '#FFD700' }}>{item.art?.artTitle || 'N/A'}</Typography>
-                                                <Typography variant="body2" style={{ color: '#b3b3b3' }}>
+                                            <CardContent style={styles.cardContent}>
+                                                <Typography variant="h6" style={styles.artTitle}>
+                                                    {item.art?.artTitle || 'N/A'}
+                                                </Typography>
+                                                <Typography variant="body2" style={styles.description}>
                                                     {item.art?.description || 'No description available'}
                                                 </Typography>
-                                                <Typography variant="body2" style={{ marginTop: '10px', color: '#b3b3b3' }}>
+                                                <Typography variant="body2" style={styles.category}>
                                                     Category: {item.art?.category || 'N/A'}
                                                 </Typography>
-                                                <Typography variant="body1" style={{ fontWeight: 'bold', marginTop: '5px', color: '#FFD700' }}>
+                                                <Typography variant="body1" style={styles.price}>
                                                     Price: ${item.art?.price ? item.art.price.toFixed(2) : 'N/A'}
                                                 </Typography>
                                                 <IconButton
                                                     onClick={(e) => {
-                                                        e.stopPropagation(); // Prevent triggering card click
+                                                        e.stopPropagation();
                                                         handleRemoveFromWishlist(item.id);
                                                     }}
-                                                    style={{ marginTop: '15px', color: '#FFD700' }}
+                                                    style={styles.deleteButton}
                                                 >
                                                     <DeleteIcon /> Remove
                                                 </IconButton>
@@ -149,9 +162,11 @@ const Wishlist = ({ userId }) => {
                                     </div>
                                 ))}
                             </div>
-                            <IconButton onClick={() => scrollRight(category)} style={{ position: 'absolute', right: '10px', zIndex: 1 }}>
-                                <ArrowForwardIcon style={{ color: '#FFD700' }} />
-                            </IconButton>
+                            {scrollVisibility[category]?.showRight && (
+                                <IconButton onClick={() => scrollRight(category)} style={{ ...styles.scrollButton, right: 0 }}>
+                                    <ArrowForwardIcon style={styles.icon} />
+                                </IconButton>
+                            )}
                         </div>
                     </div>
                 ))
@@ -160,14 +175,7 @@ const Wishlist = ({ userId }) => {
                 onClick={handleClearWishlist}
                 variant="contained"
                 startIcon={<ClearAllIcon />}
-                style={{
-                    marginTop: '20px',
-                    backgroundColor: '#FFD700',
-                    color: '#1b1b2f',
-                    borderRadius: '25px',
-                    padding: '10px 20px',
-                    fontWeight: 'bold',
-                }}
+                style={styles.clearButton}
                 disabled={wishlist.length === 0}
             >
                 Clear Wishlist
@@ -178,11 +186,101 @@ const Wishlist = ({ userId }) => {
 
 // Inline CSS styles for Wishlist Component
 const styles = {
+    container: {
+        maxWidth: '1200px',
+        margin: 'auto',
+        padding: '20px',
+        background: 'linear-gradient(135deg, #1b1b2f 30%, #2c2c47)',
+        color: '#fff',
+        borderRadius: '20px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    },
+    title: {
+        color: '#FFD700',
+        fontWeight: 'bold',
+    },
+    noItemsText: {
+        color: '#b3b3b3',
+        textAlign: 'center',
+        fontStyle: 'italic',
+    },
+    categoryTitle: {
+        color: '#FFD700',
+        marginBottom: '10px',
+        fontWeight: 'bold',
+    },
+    sliderWrapper: {
+        position: 'relative',
+        overflow: 'hidden',
+    },
     wishlistSlider: {
         display: 'flex',
         overflowX: 'auto',
         scrollBehavior: 'smooth',
         padding: '20px 0',
+        scrollbarWidth: 'none', // For Firefox
+    msOverflowStyle: 'none', // For IE and Edge
+    },
+    cardWrapper: {
+        display: 'inline-block',
+        minWidth: '300px',
+        marginRight: '10px',
+        cursor: 'pointer',
+    },
+    card: {
+        backgroundColor: '#2e2e3d',
+        borderRadius: '15px',
+        boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
+        width: '300px',
+        transition: 'transform 0.2s',
+    },
+    cardImage: {
+        borderRadius: '15px 15px 0 0',
+        objectFit: 'cover',
+    },
+    cardContent: {
+        color: '#d1d1e9',
+        padding: '16px',
+    },
+    artTitle: {
+        color: '#FFD700',
+        fontWeight: 'bold',
+    },
+    description: {
+        color: '#b3b3b3',
+        marginTop: '8px',
+    },
+    category: {
+        marginTop: '10px',
+        color: '#b3b3b3',
+    },
+    price: {
+        fontWeight: 'bold',
+        marginTop: '5px',
+        color: '#FFD700',
+    },
+    deleteButton: {
+        marginTop: '15px',
+        color: '#FFD700',
+    },
+    scrollButton: {
+        position: 'absolute',
+        zIndex: 1,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        backgroundColor: '#333',
+    },
+    icon: {
+        color: '#FFD700',
+    },
+    clearButton: {
+        marginTop: '20px',
+        backgroundColor: '#FFD700',
+        color: '#1b1b2f',
+        borderRadius: '25px',
+        padding: '10px 20px',
+        fontWeight: 'bold',
+        width: '100%',
     },
 };
 
