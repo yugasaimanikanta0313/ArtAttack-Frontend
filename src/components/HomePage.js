@@ -9,10 +9,10 @@ function HomePage() {
             <nav>
                 <img src={logo} alt="Logo" />
                 <div className="nav-links">
+                <Link to="/shop" className="nav-link">Shop</Link> {/* New Shop link */}
+
                     <Link to="/register" className="nav-link">Register</Link>
-                    {/* <Link to="/aboutUs" className="nav-link">About Us</Link> */}
-                    {/* <Link to="/admin-login" className="nav-link">Admin Login</Link> */}
-                    <Link to="/login" className="nav-link login-link">Login</Link> {/* Apply the login-link class */}
+                    <Link to="/login" className="nav-link login-link">Login</Link>
                 </div>
             </nav>
             <div className="content">

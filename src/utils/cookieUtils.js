@@ -17,5 +17,6 @@ export function getSession(sname) {
 }
 
 export function clearSession(sname) {
-    document.cookie = `${sname}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+    document.cookie = `${sname}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=None;Secure`;
+    
 }

@@ -19,6 +19,8 @@ import Cart from './components/Cart';
 import { getSession } from './utils/cookieUtils'; 
 import GetAllUsers from './components/GetAllUsers';
 import ProfileUpdate from './components/ProfileUpdate';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 function App() {
     const userId = getSession('userId');
     return (
@@ -46,6 +48,8 @@ function App() {
                     <Route path="/view-art" element={<ViewArts />} />
                     <Route path="/view-art/:artId" element={<ViewArt />} />
                     <Route path="/arts/update/:artId" element={<UpdateArt />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>
                 </>
             

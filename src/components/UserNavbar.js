@@ -30,7 +30,7 @@ const UserNavbar = () => {
   const handleLogout = () => {
     sessionStorage.clear(); // Clear session storage if needed
     clearSession('userId'); // Clear the userId cookie or session
-    navigate('/login'); // Redirect to login page
+    navigate('/'); // Redirect to login page
   };
 
   return (
